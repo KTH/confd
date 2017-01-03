@@ -10,6 +10,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/kelseyhightower/memkv"
 )
 
 func newFuncMap() map[string]interface{} {
@@ -30,6 +32,10 @@ func newFuncMap() map[string]interface{} {
 	m["lookupIP"] = LookupIP
 	m["lookupSRV"] = LookupSRV
 	m["fileExists"] = isFileExist
+	m["getPublishedFrontEnds"] = getPublishedFrontEnds
+	m["getDefaultFontEnds"] = getDefaultFontEnds
+	m["getPublishedBackEnds"] = getPublishedBackEnds
+	m["getDefaultBackEnds"] = getDefaultBackEnds
 	return m
 }
 
@@ -37,6 +43,62 @@ func addFuncs(out, in map[string]interface{}) {
 	for name, fn := range in {
 		out[name] = fn
 	}
+}
+
+func getJSONArrayValue(json map[string]interface{}, jsonKey string, arrayKey string) interface{} {
+	if json[jsonKey] != nil {
+		return json[jsonKey].(map[string]interface{})[arrayKey]
+	}
+	return nil
+}
+
+func getPublishedFrontEnds(param []memkv.KVPair, service string) map[string]string {
+	fmt.Printf("Service: %s", service)
+	var m = make(map[string]string)
+	for _, v := range param {
+		var json, _ = UnmarshalJsonObject(v.Value)
+		var publishAttr = getJSONArrayValue(json, "attrs", "publish")
+		if publishAttr != nil {
+			m[publishAttr.(string)] = service
+		}
+	}
+	return m
+}
+
+func getDefaultFontEnds(param []memkv.KVPair, service string) map[string]string {
+	var m = make(map[string]string)
+	for _, v := range param {
+		var json, _ = UnmarshalJsonObject(v.Value)
+		var defaultAttr = getJSONArrayValue(json, "attrs", "default")
+		if defaultAttr != nil {
+			m["default"] = service
+		}
+	}
+	return m
+}
+
+func getPublishedBackEnds(param []memkv.KVPair) map[string]string {
+	var m = make(map[string]string)
+	for _, v := range param {
+		var json, _ = UnmarshalJsonObject(v.Value)
+		var publishAttr = getJSONArrayValue(json, "attrs", "publish")
+		if publishAttr != nil {
+			m[v.Key] = fmt.Sprintf("%s:%g", json["ip"], json["port"])
+		}
+	}
+	return m
+}
+
+func getDefaultBackEnds(param []memkv.KVPair) map[string]string {
+	var m = make(map[string]string)
+	for _, v := range param {
+		var json, _ = UnmarshalJsonObject(v.Value)
+		var defaultAttr = getJSONArrayValue(json, "attrs", "default")
+		if defaultAttr != nil {
+			m[v.Key] = fmt.Sprintf("%s:%g", json["ip"], json["port"])
+		}
+	}
+	return m
 }
 
 // Getenv retrieves the value of the environment variable named by the key.
