@@ -44,6 +44,8 @@ keys = [
 
 * haproxy.new should now be available at the root of the project
 
+## Original confd readme
+
 `confd` is a lightweight configuration management tool focused on:
 
 * keeping local configuration files up-to-date using data stored in [etcd](https://github.com/coreos/etcd),
