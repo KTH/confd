@@ -36,9 +36,7 @@ keys = [
 
 ```etcdctl set /services/kth-azure-app/everest-blue-worker2:kthazureapp_web_1:3000 '{"port":32770,"ip":"10.28.21.133","tags":["app","kth","web","nodejs"],"attrs":{"publish":"/_azure/_monitor"}}'```
 
-* Build confd: 
-
-```./build```
+* Build confd by running ./build
 
 * Run confd: 
 
