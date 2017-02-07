@@ -33,7 +33,7 @@ func newFuncMap() map[string]interface{} {
 	m["lookupSRV"] = LookupSRV
 	m["fileExists"] = isFileExist
 	m["getPublishedFrontEnds"] = getPublishedFrontEnds
-	m["getDefaultFontEnds"] = getDefaultFontEnds
+	m["getDefaultFrontEnds"] = getDefaultFrontEnds
 	m["getPublishedBackEnds"] = getPublishedBackEnds
 	m["getDefaultBackEnds"] = getDefaultBackEnds
 	return m
@@ -53,7 +53,6 @@ func getJSONArrayValue(json map[string]interface{}, jsonKey string, arrayKey str
 }
 
 func getPublishedFrontEnds(param []memkv.KVPair, service string) map[string]string {
-	fmt.Printf("Service: %s", service)
 	var m = make(map[string]string)
 	for _, v := range param {
 		var json, _ = UnmarshalJsonObject(v.Value)
@@ -65,7 +64,7 @@ func getPublishedFrontEnds(param []memkv.KVPair, service string) map[string]stri
 	return m
 }
 
-func getDefaultFontEnds(param []memkv.KVPair, service string) map[string]string {
+func getDefaultFrontEnds(param []memkv.KVPair, service string) map[string]string {
 	var m = make(map[string]string)
 	for _, v := range param {
 		var json, _ = UnmarshalJsonObject(v.Value)
