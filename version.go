@@ -1,3 +1,3 @@
 package main
 
-const Version = "0.12.2-kth"
+const Version = "0.12.3-kth"

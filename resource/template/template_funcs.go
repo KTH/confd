@@ -52,6 +52,11 @@ func getJSONArrayValue(json map[string]interface{}, jsonKey string, arrayKey str
 	return nil
 }
 
+func getServiceFromEtcdPath(path string) string {
+	var lastSlashIndex = strings.LastIndex(path, "/")
+	return path[lastSlashIndex+1:]
+}
+
 func getPublishedFrontEnds(param []memkv.KVPair, service string) map[string]string {
 	var m = make(map[string]string)
 	for _, v := range param {
@@ -82,7 +87,8 @@ func getPublishedBackEnds(param []memkv.KVPair) map[string]string {
 		var json, _ = UnmarshalJsonObject(v.Value)
 		var publishAttr = getJSONArrayValue(json, "attrs", "publish")
 		if publishAttr != nil {
-			m[v.Key] = fmt.Sprintf("%s:%g", json["ip"], json["port"])
+			var service = getServiceFromEtcdPath(v.Key)
+			m[service] = fmt.Sprintf("%s:%g", json["ip"], json["port"])
 		}
 	}
 	return m
@@ -94,7 +100,8 @@ func getDefaultBackEnds(param []memkv.KVPair) map[string]string {
 		var json, _ = UnmarshalJsonObject(v.Value)
 		var defaultAttr = getJSONArrayValue(json, "attrs", "default")
 		if defaultAttr != nil {
-			m[v.Key] = fmt.Sprintf("%s:%g", json["ip"], json["port"])
+			var service = getServiceFromEtcdPath(v.Key)
+			m[service] = fmt.Sprintf("%s:%g", json["ip"], json["port"])
 		}
 	}
 	return m
